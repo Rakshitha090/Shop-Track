@@ -1,0 +1,23 @@
+# ==============================================================================
+# ShopTrack - Security & Routing Configuration for Apache
+# ==============================================================================
+
+# 1. Prevent Directory Browsing
+Options -Indexes
+
+# 2. Block direct access to sensitive configuration and database files
+<FilesMatch "^\.env|\.git|\.sqlite$|schema.*\.sql$">
+    Require all denied
+</FilesMatch>
+
+# 3. Protect sensitive directories
+RedirectMatch 403 ^/database/
+RedirectMatch 403 ^/config/
+
+# 4. Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

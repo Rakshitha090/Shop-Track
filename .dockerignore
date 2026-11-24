@@ -1,0 +1,12 @@
+.env
+.env.local
+.git
+.gitignore
+*.bat
+*.vbs
+database/*.sqlite
+database/*.sqlite-wal
+database/*.sqlite-shm
+tests/
+.vscode/
+.idea/
