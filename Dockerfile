@@ -3,12 +3,7 @@ FROM php:8.3-apache
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && docker-php-ext-install pdo_pgsql pdo_mysql \
-    && for m in mpm_event mpm_worker mpm_prefork; do \
-        a2dismod "$m" 2>/dev/null || true; \
-    done \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && a2enmod mpm_prefork rewrite headers \
-    && apache2ctl -M \
+    && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PORT=8080
@@ -22,4 +17,4 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 8080
 
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "sed -i \"s/Listen 80/Listen ${PORT}/\" /etc/apache2/ports.conf && sed -i \"s#\\*:80#*:${PORT}#\" /etc/apache2/sites-available/000-default.conf && exec apache2-foreground"]
