@@ -1,14 +1,14 @@
-# ShopTrack - Railway Deployment
 FROM php:8.3-apache
 
-# Install PostgreSQL dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && docker-php-ext-install pdo_pgsql pdo_mysql \
+    && for m in mpm_event mpm_worker mpm_prefork; do \
+        a2dismod "$m" 2>/dev/null || true; \
+    done \
     && rm -f /etc/apache2/mods-enabled/mpm_*.load \
-              /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod mpm_prefork rewrite headers \
-    && apache2ctl -M 2>&1 | grep mpm_prefork \
+    && apache2ctl -M \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PORT=8080
@@ -22,4 +22,4 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 8080
 
-CMD ["bash", "-lc", "sed -i 's/^Listen 80$/Listen ${PORT}/' /etc/apache2/ports.conf && sed -i 's#<VirtualHost \\*:80>#<VirtualHost *:${PORT}>#' /etc/apache2/sites-available/000-default.conf && exec apache2-foreground"]
+CMD ["apache2-foreground"]
